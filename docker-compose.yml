@@ -1,0 +1,9 @@
+version: "3.9"
+
+services:
+  wayfinder-worker-service:
+    restart: always
+    image: wayfinder-worker:latest
+    container_name: wayfinder-worker
+    ports:
+      - 10000:10000

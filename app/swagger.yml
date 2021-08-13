@@ -1,0 +1,180 @@
+openapi: 3.0.0
+info:
+  title: Eye of Beholder API
+  version: 0.0.1
+
+tags:
+  - name: Authorization
+components:
+  headers:
+    RequestSuccess:
+      schema:
+        type: string
+      description: "if the application has successfully processed the request, it returns success. If an error occurs during the processing of the request, it returns fail."
+
+  responses:
+    minimalResponse:
+      description: "OK"
+
+    NotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+
+    BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+
+    Conflict:
+      description: Resource Already Exist
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+
+    ImaTeapot:
+      description: Code Execution Error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+
+    InternalError:
+      description: Internal Server Error
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        error_code:
+          type: string
+        developer_message:
+          type: string
+      required:
+        - error_code
+        - message
+        - developer_message
+    Token:
+      type: object
+      properties:
+        token:
+          type: string
+        refresh_token:
+          type: string
+    User:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+
+    CreateUser:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+        email:
+          type: string
+
+paths:
+  /api/signin:
+    post:
+      summary: "auth by username and password and get access and refresh tokens"
+      tags:
+        - Authorization
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      description: "User authentication, JWT"
+      responses:
+        '200':
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Token"
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '418':
+          $ref: "#/components/responses/ImaTeapot"
+        '500':
+          $ref: "#/components/responses/InternalError"
+    put:
+      summary: "get access using refresh token"
+      tags:
+        - Authorization
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/Token"
+                - required:
+                    - refresh_token
+      description: "User authentication, JWT"
+      responses:
+        '201':
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Token"
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '418':
+          $ref: "#/components/responses/ImaTeapot"
+        '500':
+          $ref: "#/components/responses/InternalError"
+  /api/signup:
+    post:
+      summary: "create new user"
+      tags:
+        - Authorization
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/CreateUser"
+      description: "User authentication, JWT"
+      responses:
+        '201':
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Token"
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '418':
+          $ref: "#/components/responses/ImaTeapot"
+        '500':
+          $ref: "#/components/responses/InternalError"
+  
+  

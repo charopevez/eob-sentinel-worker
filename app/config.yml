@@ -1,0 +1,11 @@
+---
+
+is_debug: true
+jwt:
+  secret: $3cr3t
+listen:
+  type: port
+  bind_ip: 0.0.0.0
+  port: 10000
+sentinel_service:
+  url: http://sentinel_worker:10005/api
